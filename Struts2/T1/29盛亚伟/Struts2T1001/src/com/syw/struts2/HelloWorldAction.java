@@ -1,35 +1,30 @@
-package com.syw.struts;
+package com.syw.struts2;
 
 import com.opensymphony.xwork2.Action;
 
 public class HelloWorldAction implements Action {
 	private String content;
-	private String uname;
+	
+	
 	
 	public String getContent() {
 		return content;
 	}
 
-
 	public void setContent(String content) {
 		this.content = content;
 	}
 
+	public HelloWorldAction() {
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public String execute() throws Exception {
 		// TODO Auto-generated method stub
-		content="hello!  "+uname;
+		content = "hello word!";
+		
 		return Action.SUCCESS;
 	}
 
-
-	public String getUname() {
-		return uname;
-	}
-
-
-	public void setUname(String uname) {
-		this.uname = uname;
-	}
 }
