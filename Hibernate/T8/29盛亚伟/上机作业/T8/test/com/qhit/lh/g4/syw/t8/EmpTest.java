@@ -1,0 +1,168 @@
+package com.qhit.lh.g4.syw.t8;
+
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.junit.Test;
+
+import com.qhit.lh.g4.syw.t8.bean.Dept;
+import com.qhit.lh.g4.syw.t8.bean.Emp;
+import com.qhit.lh.g4.syw.t8.bean.UserInfo;
+import com.qhit.lh.g4.syw.t8.dao.BaseDao;
+import com.qhit.lh.g4.syw.t8.dao.impl.BaseDaoImpl;
+import com.qhit.lh.g4.syw.t8.utils.HibernateSessionFactory;
+
+/**
+ * @author 盛亚伟
+ *2017年12月15日上午9:54:25
+ *TODO
+ */
+public class EmpTest {
+	private BaseDao basedao = new BaseDaoImpl();
+	private BaseDao baseService;
+	@Test
+	public void add(){
+		//录入基本信息
+		Emp emp = new Emp();
+		emp.setEmpName("sss");
+		emp.setEmpSex("M");
+		emp.setBirthday("2017-12-12");
+		emp.setDeptId(1);
+		//分配账户信息
+		UserInfo userInfo = new UserInfo();
+		userInfo.setUserName("SSS");
+		userInfo.setPassword("123456");
+		
+		emp.setUserInfo(userInfo);
+		userInfo.setEmp(emp);
+
+		basedao.add(emp);
+	}
+	
+	@Test
+	public void delete(){
+		Emp emp = new Emp();
+		emp.setEid(2);
+		
+		UserInfo userInfo = new UserInfo();
+		userInfo.setEmp(emp);
+		
+		basedao.delete(emp);
+		}
+	
+	@Test
+	public void update(){
+		//先找人
+		Emp emp1 = (Emp) basedao.getObjectById(Emp.class,6);
+		Emp emp2 = (Emp) basedao.getObjectById(Emp.class,5);
+		//改的是当前员工所属的部门
+		Dept dept = (Dept) basedao.getObjectById(Dept.class, 8);
+		//分配部门
+		emp1.setDept(dept);
+		emp2.setDept(dept);
+		//更新提交
+		basedao.update(emp1);
+		basedao.update(emp2);
+		
+		Emp emp = new Emp();
+		emp.setEid(2);
+		emp.setEmpName("李四");
+		emp.setEmpSex("男");
+		emp.setBirthday("1991-1-11");
+		emp.setDeptId(2);
+
+		UserInfo userinfo = new UserInfo();
+		userinfo.setUserId(4);
+		userinfo.setUserName("lisi");
+		userinfo.setUpswd("123456");
+
+		userinfo.setEmp(emp);
+		emp.setUserInfo(userinfo);
+
+		basedao.update(emp);
+
+	}
+	
+	@Test
+	public void query(){
+		Emp emp = new Emp();
+		emp.setEid(4);
+		UserInfo userinfo = new UserInfo();
+		userinfo.setUserId(4);
+		emp.setUserInfo(userinfo);
+		basedao.delete(emp);
+	}
+	
+	@Test
+	public void queryAll(){
+		List<Object> emps = basedao.queryAll("from Emp");
+		for (Object object : emps) {
+			Emp emp=(Emp) object;
+			System.out.println(emp.toString());
+		}
+	}
+	@Test
+	public void getEmpByName(){
+		List<Emp> res = baseService.getEmpByName("%张%");
+
+		for(Emp emp : res){
+			System.out.println(emp.getEid()+":"+emp.getEmpName());
+		}
+	}
+	
+	public void getEmpLikeName(){
+		Session session = HibernateSessionFactory.getSession();
+
+		Criteria criteria = session.createCriteria(Emp.class)
+				.add(Restrictions.like("ename", "张%"));
+
+		List<Emp> list = criteria.list();
+		
+		for (Emp emp : list) {
+			System.out.println(emp.getEid()+":"+emp.getEmpName());
+		}
+	}
+	
+	public void getEmpByDeptName(){
+		Session session = HibernateSessionFactory.getSession();
+		
+		Criteria criteria = session.createCriteria(Emp.class)
+				.setFetchMode("dept", FetchMode.JOIN)
+				.createAlias("dept", "d")
+				.add(Restrictions.eq("d.deptName","技术部"));
+		
+		List<Emp> list = criteria.list();
+		
+		for (Emp emp : list) {
+			System.out.println(emp.getEid()+":"+emp.getEmpName());
+		}
+	}
+	
+	public void getDeptInfo(){
+		Session session = HibernateSessionFactory.getSession();
+		
+		Criteria criteria = session.createCriteria(Dept.class)
+				.setFetchMode("emps", FetchMode.JOIN)
+				.createAlias("emps", "e");
+		
+		ProjectionList pList = Projections.projectionList()
+				.add(Projections.groupProperty("deptId"))
+				.add(Projections.groupProperty("deptName"))
+				.add(Projections.groupProperty("address"))
+				.add(Projections.count("e.eid"));
+		
+		criteria.setProjection(pList);
+		
+		List<Object[]> list = criteria.list();
+		
+		for (Object[] obj : list) {
+			System.out.println(obj[0]+"|"+obj[1]+"|"+obj[2]+"|"+obj[3]);
+		}
+	}
+
+}
