@@ -1,0 +1,28 @@
+SQL> host cls
+
+SQL> show sga;
+
+Total System Global Area  778387456 bytes                                       
+Fixed Size                  1374808 bytes                                       
+Variable Size             243271080 bytes                                       
+Database Buffers          528482304 bytes                                       
+Redo Buffers                5259264 bytes                                       
+SQL> select name from v$database;
+
+NAME                                                                            
+------------------                                                              
+ORCL                                                                            
+
+SQL> select name from v$datafile;
+
+NAME                                                                            
+--------------------------------------------------------------------------------
+C:\APP\S01\ORADATA\ORCL\SYSTEM01.DBF                                            
+C:\APP\S01\ORADATA\ORCL\SYSAUX01.DBF                                            
+C:\APP\S01\ORADATA\ORCL\UNDOTBS01.DBF                                           
+C:\APP\S01\ORADATA\ORCL\USERS01.DBF                                             
+C:\APP\S01\ORADATA\ORCL\EXAMPLE01.DBF                                           
+
+SQL> show user;
+USER Ϊ "SYS"
+SQL> spool off;
